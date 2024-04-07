@@ -8,7 +8,6 @@ import com.playtomic.tests.wallet.entity.Wallet;
 import com.playtomic.tests.wallet.exception.PaymentFailedException;
 import com.playtomic.tests.wallet.exception.StripeAmountTooSmallException;
 import com.playtomic.tests.wallet.model.Payment;
-import com.playtomic.tests.wallet.model.PaymentOrderDto;
 import com.playtomic.tests.wallet.repository.WalletRepository;
 import com.playtomic.tests.wallet.service.PaymentService;
 import com.playtomic.tests.wallet.service.StripeService;

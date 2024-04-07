@@ -28,14 +28,4 @@ public class WalletDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("transactions")
     private List<Transaction> transactions;
-
-    @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private static class Cards {
-        private String alias;
-        private String pan;
-        private String expirationDate;
-        private String cvv;
-        private String holder;
-    }
 }
