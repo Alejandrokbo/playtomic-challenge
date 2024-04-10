@@ -13,6 +13,7 @@ import com.playtomic.tests.wallet.repository.WalletRepository;
 import lombok.Synchronized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -33,6 +34,7 @@ public class PaymentService {
 
     private final Lock lock = new ReentrantLock();
 
+    @Transactional
     @Synchronized
     public Transaction processPayment(String walletId, double amount, String cardAlias) {
         Wallet wallet = walletService.getWallet(walletId);
