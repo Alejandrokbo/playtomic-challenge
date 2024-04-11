@@ -5,12 +5,11 @@ import com.playtomic.tests.wallet.constants.TransactionStatus;
 import com.playtomic.tests.wallet.entity.Card;
 import com.playtomic.tests.wallet.entity.Transaction;
 import com.playtomic.tests.wallet.entity.Wallet;
-import com.playtomic.tests.wallet.exception.cardException.NotCardFoundException;
 import com.playtomic.tests.wallet.exception.PaymentFailedException;
 import com.playtomic.tests.wallet.exception.StripeAmountTooSmallException;
+import com.playtomic.tests.wallet.exception.cardException.NotCardFoundException;
 import com.playtomic.tests.wallet.model.Payment;
 import com.playtomic.tests.wallet.repository.WalletRepository;
-import lombok.Synchronized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 public class PaymentService {
@@ -33,7 +30,7 @@ public class PaymentService {
     private WalletRepository walletRepository;
 
     @Transactional
-    public Transaction processPayment(String walletId, double amount, String cardAlias) {
+    public Transaction processPayment(String walletId, BigDecimal amount, String cardAlias) {
         Wallet wallet = walletService.getWallet(walletId);
         Transaction transaction = new Transaction(amount, TransactionConcept.DEPOSIT.name(), TransactionStatus.PENDING);
 
@@ -51,7 +48,7 @@ public class PaymentService {
         transaction.setCardAlias(cardAlias);
         Payment paymentId = null;
         try {
-            paymentId = stripe.charge(cardPayment, BigDecimal.valueOf(amount));
+            paymentId = stripe.charge(cardPayment, amount);
             Thread.sleep(5000);
         } catch (StripeAmountTooSmallException e) {
             throw new StripeAmountTooSmallException();
@@ -72,7 +69,7 @@ public class PaymentService {
         transaction.setStatus(TransactionStatus.COMPLETED.name());
         transaction.setRelativeBalance(wallet.getBalance());
 
-        double currentBalance = wallet.getBalance() + amount;
+        BigDecimal currentBalance = wallet.getBalance().add(amount);
         transaction.setCurrentBalance(currentBalance);
 
         wallet.setBalance(currentBalance);

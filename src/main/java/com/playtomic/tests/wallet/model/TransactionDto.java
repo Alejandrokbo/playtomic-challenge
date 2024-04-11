@@ -3,6 +3,7 @@ package com.playtomic.tests.wallet.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -20,7 +21,7 @@ public class TransactionDto {
     @JsonProperty("transactionDate")
     private Date transactionDate;
     @JsonProperty("relativeBalance")
-    private double relativeBalance;
+    private BigDecimal relativeBalance;
     @JsonProperty("currentBalance")
-    private double currentBalance;
+    private BigDecimal currentBalance;
 }

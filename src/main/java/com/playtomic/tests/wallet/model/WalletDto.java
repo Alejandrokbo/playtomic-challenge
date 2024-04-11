@@ -7,6 +7,7 @@ import com.playtomic.tests.wallet.entity.Card;
 import com.playtomic.tests.wallet.entity.Transaction;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -19,7 +20,7 @@ public class WalletDto {
     private String playerName;
 
     @JsonProperty("balance")
-    private double balance;
+    private BigDecimal balance;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("cards")

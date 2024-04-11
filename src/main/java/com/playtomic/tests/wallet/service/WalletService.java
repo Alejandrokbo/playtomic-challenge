@@ -10,6 +10,7 @@ import com.playtomic.tests.wallet.utils.CardValidations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.playtomic.tests.wallet.utils.CardValidations.formatCreditCardNumber;
@@ -21,7 +22,7 @@ public class WalletService {
     private WalletRepository walletRepository;
 
     public Wallet createWallet(String playerName) {
-        Wallet newWallet = new Wallet(playerName, 0.0);
+        Wallet newWallet = new Wallet(playerName, BigDecimal.valueOf(0.00));
         return walletRepository.save(newWallet);
     }
 
