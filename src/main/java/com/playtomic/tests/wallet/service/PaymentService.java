@@ -32,10 +32,7 @@ public class PaymentService {
     @Autowired
     private WalletRepository walletRepository;
 
-    private final Lock lock = new ReentrantLock();
-
     @Transactional
-    @Synchronized
     public Transaction processPayment(String walletId, double amount, String cardAlias) {
         Wallet wallet = walletService.getWallet(walletId);
         Transaction transaction = new Transaction(amount, TransactionConcept.DEPOSIT.name(), TransactionStatus.PENDING);
@@ -53,7 +50,6 @@ public class PaymentService {
         }
         transaction.setCardAlias(cardAlias);
         Payment paymentId = null;
-        lock.lock();
         try {
             paymentId = stripe.charge(cardPayment, BigDecimal.valueOf(amount));
             Thread.sleep(5000);
@@ -69,7 +65,6 @@ public class PaymentService {
                 walletRepository.save(wallet);
                 Thread.currentThread().interrupt();
             }
-            lock.unlock();
         }
 
         transaction.setPaymentId(paymentId != null ? paymentId.getId() : null);
