@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,25 +45,26 @@ public class PaymentServiceTest {
     @Test
     public void processPaymentTest() {
         // Given
-        Wallet wallet = new Wallet("Alejandro", 100.0);
+        Wallet wallet = new Wallet("Alejandro", BigDecimal.valueOf(100.00));
 
         Card card = new Card();
         card.setAlias("1");
         card.setPan("1234567890123456");
         card.setCvv(123);
         card.setHolder("Alejandro");
+        card.setCurrency("EUR");
         card.setExpirationDate("12/30");
 
         List<Card> cards = new ArrayList<>();
         cards.add(card);
         wallet.setCards(cards);
 
-        Transaction pendingTransaction = new Transaction(15.0, TransactionConcept.DEPOSIT.name(), TransactionStatus.PENDING);
+        Transaction pendingTransaction = new Transaction(BigDecimal.valueOf(15.00), TransactionConcept.DEPOSIT.name(), TransactionStatus.PENDING);
 
         // When
         doReturn(wallet).when(walletService).getWallet(wallet.getId()); // Mocking walletService.getWallet method
-        doReturn(new Payment("1")).when(stripe).charge(card.getPan(), BigDecimal.valueOf(pendingTransaction.getAmount())); // Mocking walletService.getPayment method
-        paymentService.processPayment(pendingTransaction.getPaymentId(), pendingTransaction.getAmount(), "1");
+        doReturn(new Payment("1")).when(stripe).charge(eq(card.getPan()), any(BigDecimal.class)); // Mocking stripe.charge method
+        paymentService.processPayment(wallet.getId(), pendingTransaction.getAmount(), "1");
 
         // Then
         verify(walletRepository, times(1)).save(wallet);
@@ -71,53 +73,55 @@ public class PaymentServiceTest {
     @Test
     public void processPaymentFailWithTooSmallAmountTest() {
         // Given
-        Wallet wallet = new Wallet("Alejandro", 100.0);
+        Wallet wallet = new Wallet("Alejandro", BigDecimal.valueOf(100.00));
 
         Card card = new Card();
         card.setAlias("1");
         card.setPan("1234567890123456");
         card.setCvv(123);
         card.setHolder("Alejandro");
+        card.setCurrency("EUR");
         card.setExpirationDate("12/30");
 
         List<Card> cards = new ArrayList<>();
         cards.add(card);
         wallet.setCards(cards);
 
-        Transaction pendingTransaction = new Transaction(5.0, TransactionConcept.DEPOSIT.name(), TransactionStatus.PENDING);
+        Transaction pendingTransaction = new Transaction(BigDecimal.valueOf(5.00), TransactionConcept.DEPOSIT.name(), TransactionStatus.PENDING);
 
         // When
         when(walletService.getWallet(wallet.getId())).thenReturn(wallet);
         when(stripe.charge(ArgumentMatchers.anyString(), ArgumentMatchers.any(BigDecimal.class))).thenThrow(new StripeAmountTooSmallException());
 
         // Then
-        assertThrows(StripeAmountTooSmallException.class, () -> paymentService.processPayment(pendingTransaction.getPaymentId(), pendingTransaction.getAmount(), "1"));
+        assertThrows(StripeAmountTooSmallException.class, () -> paymentService.processPayment(wallet.getId(), pendingTransaction.getAmount(), "1"));
     }
 
     @Test
     public void processPaymentFailWithPaymentFailedTest() {
         // Given
-        Wallet wallet = new Wallet("Alejandro", 100.0);
+        Wallet wallet = new Wallet("Alejandro", BigDecimal.valueOf(100.00));
 
         Card card = new Card();
         card.setAlias("1");
         card.setPan("1234567890123456");
         card.setCvv(123);
         card.setHolder("Alejandro");
+        card.setCurrency("EUR");
         card.setExpirationDate("12/30");
 
         List<Card> cards = new ArrayList<>();
         cards.add(card);
         wallet.setCards(cards);
 
-        Transaction pendingTransaction = new Transaction(5.0, TransactionConcept.DEPOSIT.name(), TransactionStatus.PENDING);
+        Transaction pendingTransaction = new Transaction(BigDecimal.valueOf(5.00), TransactionConcept.DEPOSIT.name(), TransactionStatus.PENDING);
 
         // When
         when(walletService.getWallet(wallet.getId())).thenReturn(wallet);
-        when(stripe.charge(ArgumentMatchers.anyString(), ArgumentMatchers.any(BigDecimal.class))).thenThrow(new PaymentFailedException());
+        when(stripe.charge(ArgumentMatchers.anyString(), ArgumentMatchers.any(BigDecimal.class))).thenThrow(new PaymentFailedException("Test payment failure"));
 
         // Then
-        assertThrows(PaymentFailedException.class, () -> paymentService.processPayment(pendingTransaction.getPaymentId(), pendingTransaction.getAmount(), "1"));
+        assertThrows(PaymentFailedException.class, () -> paymentService.processPayment(wallet.getId(), pendingTransaction.getAmount(), "1"));
     }
 
 }

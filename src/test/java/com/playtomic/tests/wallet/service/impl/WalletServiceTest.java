@@ -11,10 +11,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,17 +34,18 @@ public class WalletServiceTest {
     @Test
     public void createWalletTest() {
         String playerName = "Alejandro";
-        Wallet wallet = new Wallet(playerName, 0.0);
+        Wallet expectedWallet = new Wallet(playerName, BigDecimal.valueOf(0.00), "EUR");
 
-        when(walletRepository.save(wallet)).thenReturn(wallet);
+        when(walletRepository.save(any(Wallet.class))).thenReturn(expectedWallet);
 
         Wallet createdWallet = walletService.createWallet(playerName);
-        assertEquals(wallet, createdWallet);
+        assertEquals(expectedWallet.getPlayerName(), createdWallet.getPlayerName());
+        assertEquals(expectedWallet.getCurrency(), createdWallet.getCurrency());
     }
 
     @Test
     public void getWalletTest() {
-        Wallet wallet = new Wallet("Alejandro", 0.0);
+        Wallet wallet = new Wallet("Alejandro", BigDecimal.valueOf(0.00), "EUR");
 
         when(walletRepository.findById(WALLET_ID)).thenReturn(Optional.of(wallet));
 

@@ -21,6 +21,7 @@ public class Wallet {
     private String id;
     private String playerName;
     private BigDecimal balance;
+    private String currency; // Default currency for the wallet
 
     private List<Card> cards;
 
@@ -32,6 +33,15 @@ public class Wallet {
     public Wallet(String playerName, BigDecimal balance) {
         this.playerName = playerName;
         this.balance = balance;
+        this.currency = "EUR"; // Default currency
+        this.cards = new ArrayList<>();
+        this.transactions = new ArrayList<>();
+    }
+    
+    public Wallet(String playerName, BigDecimal balance, String currency) {
+        this.playerName = playerName;
+        this.balance = balance;
+        this.currency = currency;
         this.cards = new ArrayList<>();
         this.transactions = new ArrayList<>();
     }

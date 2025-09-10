@@ -9,7 +9,7 @@ import java.util.Date;
 @Data
 public class TransactionDto {
     @JsonProperty("amount")
-    private double amount;
+    private BigDecimal amount;
     @JsonProperty("status")
     private String status;
     @JsonProperty("concept")

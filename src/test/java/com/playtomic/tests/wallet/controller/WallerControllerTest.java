@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 
+import java.math.BigDecimal;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -28,7 +30,7 @@ public class WallerControllerTest {
 
     @BeforeEach
     void setup() {
-        Wallet wallet = new Wallet("John Doe", 50.0);
+        Wallet wallet = new Wallet("John Doe", BigDecimal.valueOf(50.00));
         wallet.setId(WALLET_ID);
         walletRepository.save(wallet);
     }

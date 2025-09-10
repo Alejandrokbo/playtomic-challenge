@@ -21,6 +21,9 @@ public class WalletDto {
 
     @JsonProperty("balance")
     private BigDecimal balance;
+    
+    @JsonProperty("currency")
+    private String currency;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("cards")

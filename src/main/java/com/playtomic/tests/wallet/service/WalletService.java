@@ -7,6 +7,7 @@ import com.playtomic.tests.wallet.exception.WalletNotFoundException;
 import com.playtomic.tests.wallet.model.CardDto;
 import com.playtomic.tests.wallet.repository.WalletRepository;
 import com.playtomic.tests.wallet.utils.CardValidations;
+import com.playtomic.tests.wallet.utils.MoneyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,13 @@ public class WalletService {
     private WalletRepository walletRepository;
 
     public Wallet createWallet(String playerName) {
-        Wallet newWallet = new Wallet(playerName, BigDecimal.valueOf(0.00));
+        return createWallet(playerName, "EUR"); // Default currency
+    }
+    
+    public Wallet createWallet(String playerName, String currency) {
+        MoneyUtils.validateCurrency(currency);
+        BigDecimal initialBalance = MoneyUtils.validateAndNormalizeAmount(BigDecimal.valueOf(0.00));
+        Wallet newWallet = new Wallet(playerName, initialBalance, currency);
         return walletRepository.save(newWallet);
     }
 
@@ -31,10 +38,12 @@ public class WalletService {
     }
 
     public Wallet addNewCard(CardDto card) {
-
         if (!CardValidations.isValidCard(card.getPan(), card.getCvv(), card.getExpirationDate())) {
             throw new NotValidCardException();
         }
+        
+        // Validate currency
+        MoneyUtils.validateCurrency(card.getCurrency());
 
         Wallet wallet = getWallet(card.getWalletId());
 

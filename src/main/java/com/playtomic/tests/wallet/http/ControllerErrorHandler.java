@@ -1,6 +1,8 @@
 package com.playtomic.tests.wallet.http;
 
 import com.playtomic.tests.wallet.constants.ResponseConstants;
+import com.playtomic.tests.wallet.exception.CurrencyMismatchException;
+import com.playtomic.tests.wallet.exception.InvalidAmountException;
 import com.playtomic.tests.wallet.exception.PaymentFailedException;
 import com.playtomic.tests.wallet.exception.StripeAmountTooSmallException;
 import com.playtomic.tests.wallet.exception.cardException.NotCardFoundException;
@@ -66,5 +68,25 @@ public class ControllerErrorHandler {
                 ResponseConstants.PAYMENT_FAILED.getStatus(),
                 ResponseConstants.PAYMENT_FAILED.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
+    @ExceptionHandler(InvalidAmountException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Response> handleInvalidAmount(InvalidAmountException e) {
+        log.error("Invalid amount provided: {}", e.getMessage());
+        return ResponseHandler.response(
+                "INVALID_AMOUNT",
+                e.getMessage(),
+                HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(CurrencyMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Response> handleCurrencyMismatch(CurrencyMismatchException e) {
+        log.error("Currency mismatch: {}", e.getMessage());
+        return ResponseHandler.response(
+                "CURRENCY_MISMATCH",
+                e.getMessage(),
+                HttpStatus.BAD_REQUEST);
     }
 }
